@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List
 
 class IKeyLogger(ABC):
     @abstractmethod
@@ -11,5 +10,5 @@ class IKeyLogger(ABC):
         pass
 
     @abstractmethod
-    def get_logged_keys(self) -> List[str]:
+    def get_logged_keys(self):
         pass
